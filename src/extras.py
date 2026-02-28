@@ -1,7 +1,7 @@
 import torch
 
 
-def segmentation_mask(cloud,shadow=None,thin_range=(0.1,0.1),shadow_threshold=0.1):
+def segmentation_mask(cloud,shadow=None,thin_range=(0.1,0.1),shadow_threshold=0.1, clear_threshold=0.0):):
     """ The following encoding method is used:
     0: Cleary Sky
     1: Cloud
@@ -31,6 +31,7 @@ def segmentation_mask(cloud,shadow=None,thin_range=(0.1,0.1),shadow_threshold=0.
     seg_mask=torch.zeros(b,h,w)
     
     # get binary representations
+    cloud[cloud < clear_threshold] = 0.0
     thick_cloud_b=1.0*(cloud.mean(-3)>=thin_range[1])
     thin_cloud_b=1.0*(cloud.mean(-3)<thin_range[1])*(cloud.mean(-3)>=thin_range[0])*(1.0-thick_cloud_b)
     shadow_b=1.0*(shadow.mean(-3)>shadow_threshold)*(1.0-thick_cloud_b)*(1.0-thin_cloud_b)

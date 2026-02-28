@@ -31,9 +31,10 @@ def segmentation_mask(cloud,shadow=None,thin_range=(0.1,0.1),shadow_threshold=0.
     seg_mask=torch.zeros(b,h,w)
     
     # get binary representations
-    cloud[cloud < clear_threshold] = 0.0
-    thick_cloud_b=1.0*(cloud.mean(-3)>=thin_range[1])
-    thin_cloud_b=1.0*(cloud.mean(-3)<thin_range[1])*(cloud.mean(-3)>=thin_range[0])*(1.0-thick_cloud_b)
+    cloud_copy = cloud.detach().clone()
+    cloud_copy[cloud_copy < clear_threshold] = 0.0
+    thick_cloud_b=1.0*(cloud_copy.mean(-3)>=thin_range[1])
+    thin_cloud_b=1.0*(cloud_copy.mean(-3)<thin_range[1])*(cloud_copy.mean(-3)>=thin_range[0])*(1.0-thick_cloud_b)
     shadow_b=1.0*(shadow.mean(-3)>shadow_threshold)*(1.0-thick_cloud_b)*(1.0-thin_cloud_b)
 
     if thin_range[0]==thin_range[1]:
